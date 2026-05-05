@@ -1,5 +1,7 @@
 package com.kd.devinbot.scheduler;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kd.devinbot.devin.DevinClient;
 import com.kd.devinbot.github.GitHubClient;
 import com.kd.devinbot.github.GitHubIssue;
@@ -15,12 +17,14 @@ public class IssueScanner {
   private final GitHubClient gitHubClient;
   private final DevinClient devinClient;
   private final TaskStore taskStore;
+  private final ObjectMapper objectMapper;
   private Instant lastScanTime;
 
   public IssueScanner(GitHubClient gitHubClient, DevinClient devinClient, TaskStore taskStore) {
     this.gitHubClient = gitHubClient;
     this.devinClient = devinClient;
     this.taskStore = taskStore;
+    this.objectMapper = new ObjectMapper();
   }
 
   /**
@@ -59,7 +63,15 @@ public class IssueScanner {
               response
           );
 
-          System.out.println("SUCCESS: Started Devin session for issue #" + issue.number());
+          String sessionId = extractField(response, "session_id");
+          String sessionUrl = extractField(response, "url");
+
+          System.out.println(
+              "SUCCESS: Started Devin session for issue #" + issue.number()
+                  + " | session_id=" + sessionId
+                  + " | url=" + sessionUrl
+                  + " | issue=\"" + issue.title() + "\""
+          );
 
         } catch (Exception e) {
 
@@ -82,5 +94,16 @@ public class IssueScanner {
 
   public Instant getLastScanTime() {
     return lastScanTime;
+  }
+
+  private String extractField(String json, String field) {
+    try {
+      JsonNode node = objectMapper.readTree(json);
+      if (node.hasNonNull(field)) {
+        return node.get(field).asText();
+      }
+    } catch (Exception ignored) {
+    }
+    return "unknown";
   }
 }
