@@ -220,3 +220,16 @@ The `/metrics` endpoint exposes counts of remediation outcomes. For now, success
 | **Failure** | No Devin session was created (e.g. API error, invalid issue, network failure) |
 
 > **Note:** These definitions cover only the *handoff* to Devin — they do not yet reflect downstream outcomes such as whether Devin opened a PR, whether the PR was merged, or whether the underlying issue was actually resolved. Richer outcome tracking is planned.
+
+---
+
+## Storage
+
+Task records are kept in an **in-memory `ConcurrentHashMap`** inside `TaskStore`, keyed by issue number. There is no database or external cache.
+
+Implications:
+
+- All task history and de-duplication state is **lost on process restart** — previously processed issues may be picked up again on the next scan.
+- The store is process-local, so running multiple instances will not share state.
+
+A persistent backing store (e.g. Postgres or Redis) is a planned follow-up.
