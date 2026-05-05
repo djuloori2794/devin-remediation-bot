@@ -82,6 +82,52 @@ SCAN_INTERVAL_MS=120000
 
 ---
 
+## Running the Service
+
+The service ships with a `Dockerfile` and `docker-compose.yml`. The commands below pass the `.env` file you created above explicitly via `--env-file`, so its values are substituted into the compose configuration and injected into the container.
+
+### Start the service
+
+```bash
+docker compose --env-file .env up --build
+```
+
+This will:
+
+1. Build the image (multi-stage: Gradle build → slim JRE runtime)
+2. Start the container
+3. Expose the API on **`http://localhost:8080`**
+
+> **Tip:** Use `-d` to run detached: `docker compose --env-file .env up --build -d`
+
+### Verify it's running
+
+```bash
+curl http://localhost:8080/metrics
+```
+
+You should get a JSON response with zeroed-out counters on a fresh start.
+
+### View logs
+
+```bash
+docker compose logs -f
+```
+
+### Stop the service
+
+```bash
+docker compose down
+```
+
+### Rebuild after code changes
+
+```bash
+docker compose --env-file .env up --build --force-recreate
+```
+
+---
+
 ## Simulating the Workflow
 
 ### Step 1 — Create an issue
