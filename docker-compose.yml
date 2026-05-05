@@ -1,0 +1,12 @@
+services:
+  devin-remediation-bot:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DEVIN_API_KEY: ${DEVIN_API_KEY}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      GITHUB_OWNER: ${GITHUB_OWNER}
+      GITHUB_REPO: ${GITHUB_REPO}
+      SCAN_LABEL: ${SCAN_LABEL:-devin-remediate}
+      SCAN_INTERVAL_MS: ${SCAN_INTERVAL_MS:-120000}
