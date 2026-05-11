@@ -43,12 +43,23 @@ This service automates that work end-to-end:
 
 ---
 
+## Prerequisites
+
+- **Docker** and **Docker Compose** installed ([Get Docker](https://docs.docker.com/get-docker/))
+- A **Devin** account with API access ([devin.ai](https://devin.ai))
+- A **GitHub** account with:
+  - A [fork of Apache Superset](https://github.com/apache/superset/fork) under your username
+  - The label `devin-remediate` created in your fork (go to **Issues → Labels → New label**)
+  - A personal access token with `repo` scope
+
+---
+
 ## Setup
 
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/djuloori2794/devin-remediation-bot.git
 cd devin-remediation-bot
 ```
 
@@ -124,6 +135,21 @@ docker compose down
 
 ```bash
 docker compose --env-file .env up --build --force-recreate
+```
+
+### Running without Docker
+
+If you prefer to run locally (requires **Java 17+**):
+
+```bash
+DEVIN_API_KEY=your_key GITHUB_TOKEN=your_token GITHUB_OWNER=your_username GITHUB_REPO=superset \
+  ./gradlew bootRun
+```
+
+Or source your `.env` first:
+
+```bash
+export $(cat .env | xargs) && ./gradlew bootRun
 ```
 
 ---
